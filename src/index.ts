@@ -45,7 +45,7 @@ function formatPassword(
   return finalPassowrd;
 }
 
-function PasswordX(options?: {
+export function generate(options?: {
   /**
    * # Allow ambiguous characters
    * #### Default: ``false``
@@ -189,5 +189,3 @@ function PasswordX(options?: {
 
   return password;
 }
-
-export default PasswordX;

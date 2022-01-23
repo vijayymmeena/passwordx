@@ -1,5 +1,5 @@
 #! /usr/bin/env node
-import passwordX from "./index";
+import * as passwordx from "./index.js";
 import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
 
@@ -69,7 +69,7 @@ async function executeCli(): Promise<unknown> {
     for (let index = 1; index <= args.count; index++) {
       console.info(
         `password ${index}:`,
-        passwordX({
+        passwordx.generate({
           ambiguousCharacters: args.ambiguous,
           digits: args.digit,
           length: args.length,
@@ -83,7 +83,7 @@ async function executeCli(): Promise<unknown> {
   } else {
     console.info(
       `password:`,
-      passwordX({
+      passwordx.generate({
         ambiguousCharacters: args.ambiguous,
         digits: args.digit,
         length: args.length,
