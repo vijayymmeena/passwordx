@@ -1,48 +1,34 @@
 /*
-MIT License
-
-Copyright (c) 2021 Indian Ocean Roleplay
-
-Permission is hereby granted, free of charge, to any person obtaining a copy
-of this software and associated documentation files (the "Software"), to deal
-in the Software without restriction, including without limitation the rights
-to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-copies of the Software, and to permit persons to whom the Software is
-furnished to do so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all
-copies or substantial portions of the Software.
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-SOFTWARE.
-*/
-
+ * --------------------------------------------------------------------------------------------
+ * Copyright (c) Vijay Meena <vijayymmeena@gmail.com>. All rights reserved.
+ * Licensed under the MIT License. See License.txt in the project root for license information.
+ * --------------------------------------------------------------------------------------------
+ */
 import crypto from "crypto";
 
 /**
  * format password, used to check that password must have requested format
  * @param pattern
- * @param passwordLength
+ * @param passwordLength generated password length
  * @param password
  * @returns password string
  */
 function formatPassword(
-  pattern: string,
+  password: string,
   passwordLength: number,
-  password: string
+  pattern: string
 ): string {
-  const ramdomS = crypto.randomInt(pattern.length);
-  const ramdomE = crypto.randomInt(passwordLength);
-  const finalPassowrd =
-    password.substring(0, ramdomE) +
-    pattern.substring(ramdomS, ramdomS + 1) +
-    password.substring(ramdomE, passwordLength);
-  return finalPassowrd;
+  if (password.length >= passwordLength) {
+    return password;
+  }
+
+  const start = crypto.randomInt(pattern.length);
+  const end = crypto.randomInt(passwordLength);
+  const newPassword =
+    password.substring(0, end) +
+    pattern.substring(start, start + 1) +
+    password.substring(end, passwordLength);
+  return newPassword;
 }
 
 export function generate(options?: {
@@ -52,6 +38,12 @@ export function generate(options?: {
    * #### Pattern: ``{}[]()/'"`~,;:.<>\``
    */
   ambiguousCharacters?: boolean;
+
+  /**
+   * # Custom pattern
+   * #### Default: undefined
+   */
+  customPattern?: string;
 
   /**
    * # Allow digits
@@ -94,14 +86,18 @@ export function generate(options?: {
    */
   uppercase?: boolean;
 }): string {
-  const defaultPattern =
-    "abcdefghjkmnpqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+  /**
+   * Constants
+   */
   let lowercase = "abcdefghjkmnpqrstuvwxyz";
   let uppercase = "ABCDEFGHJKLMNPQRSTUVWXYZ";
   let digits = "23456789";
   let symbols = "!#$%&*+-=?@^_";
+  const defaultPattern = lowercase + uppercase + digits;
 
-  // when similar character allowed
+  /**
+   * Add similar character if allowed
+   */
   if (options?.similarCharacter) {
     lowercase += "ilo";
     uppercase += "IO";
@@ -109,82 +105,107 @@ export function generate(options?: {
     symbols += "|";
   }
 
-  // when ambiguous character allowed
+  /**
+   * Add ambiguous character if allowed
+   */
   if (options?.ambiguousCharacters) {
     symbols += "{}[]()/'\"`~,;:.<>\\";
   }
 
-  // generate final pattern
+  /**
+   * Generate final pattern
+   */
   let pattern = "";
   let patternIncluded = 0;
-  let passwordLength = options?.length ?? 8;
+  let passwordLength = options?.length ?? 16;
 
-  // if uppercase allowed
-  if (options?.uppercase ?? true) {
+  /**
+   * if uppercase allowed
+   */
+  if (options?.customPattern) {
+    pattern += options.customPattern;
+    patternIncluded++;
+  }
+
+  /**
+   * if uppercase allowed
+   */
+  if (options?.uppercase) {
     pattern += uppercase;
     patternIncluded++;
   }
 
-  // if lowercase allowed
-  if (options?.lowercase ?? true) {
+  /**
+   * if lowercase allowed
+   */
+  if (options?.lowercase) {
     pattern += lowercase;
     patternIncluded++;
   }
 
-  // if digits allowed
-  if (options?.digits ?? true) {
+  /**
+   * if digits allowed
+   */
+  if (options?.digits) {
     pattern += digits;
     patternIncluded++;
   }
 
-  // if symbols allowed
+  /**
+   * if symbols allowed
+   */
   if (options?.symbols) {
     pattern += symbols;
     patternIncluded++;
   }
 
-  // if all options are false, that was unexpected
+  /**
+   * Fallback to default pattern if no option pattern included
+   */
   if (patternIncluded === 0) {
     pattern = defaultPattern;
   }
 
-  // if length is less than one character, that was unexpected
+  /**
+   * Fallback password length to one if less than one
+   */
   if (isNaN(passwordLength) || passwordLength < 1) {
     passwordLength = 8;
   }
 
+  /**
+   * Generate password
+   */
   let password = "";
-  const patternlength = pattern.length;
-  let finalPasswordLength = passwordLength - patternIncluded;
+  const patternLength = pattern.length;
+  const finalPasswordLength =
+    passwordLength <= patternIncluded
+      ? passwordLength
+      : passwordLength - patternIncluded;
 
-  // generate password
   for (let i = 0; i < finalPasswordLength; i++) {
-    const b = crypto.randomInt(patternlength);
+    const b = crypto.randomInt(patternLength);
     password += pattern.substring(b, b + 1);
   }
 
-  // if uppercase allowed
-  if (options?.uppercase ?? true) {
-    password = formatPassword(uppercase, finalPasswordLength, password);
-    finalPasswordLength++;
+  if (options?.customPattern) {
+    password = formatPassword(password, passwordLength, options.customPattern);
   }
 
-  // if lowercase allowed
-  if (options?.lowercase ?? true) {
-    password = formatPassword(lowercase, finalPasswordLength, password);
-    finalPasswordLength++;
+  if (options?.uppercase) {
+    password = formatPassword(password, passwordLength, uppercase);
   }
 
-  // if digits allowed
-  if (options?.digits ?? true) {
-    password = formatPassword(digits, finalPasswordLength, password);
-    finalPasswordLength++;
+  if (options?.lowercase) {
+    password = formatPassword(password, passwordLength, lowercase);
   }
 
-  // if symbols allowed
+  if (options?.digits) {
+    password = formatPassword(password, passwordLength, digits);
+  }
+
   if (options?.symbols) {
-    password = formatPassword(symbols, finalPasswordLength, password);
-    finalPasswordLength++;
+    password = formatPassword(password, passwordLength, symbols);
   }
 
   return password;

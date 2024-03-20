@@ -8,32 +8,25 @@ This is open source project so you can always check out our source code to feel 
 
 # Installation
 
+## Direct Run
+
+`npx passwordx@latest`
+
 ## For project
 
 `npm install passwordx` or `yarn add passwordx`
 
 ## Global command
 
-`npm install passwordx` or `yarn global add passwordx`
+`npm install -g passwordx` or `yarn global add passwordx`
 
 # Example for projects
 
 ```typescript
 import passwordx from "passwordx";
 
-// without customize it wil generate combination of [a-zA-Z0-9] with length of 8
+// without customize it wil generate combination of [a-zA-Z0-9] with length of 16
 const securePass = passwordx();
-console.log(securePass);
-
-// customize options
-// ambiguousCharacters: boolean
-// digits: boolean
-// length: number
-// lowercase: boolean
-// similarCharacter: boolean
-// symbols: boolean
-// uppercase: boolean
-const exPass = passwordx({ length: 32, symbols: true });
 console.log(securePass);
 ```
 
@@ -59,20 +52,24 @@ password 4: zkg2Zk9kFaPwPQCHGrf2Q4s33L3XXJb4Fyq89YgbPJuMrTbqRYcaBsVpGtmq5Gch
 
 # Options
 
-- you can also read this info in `passwordx --help`
+you can also read this info in `passwordx --help`
 
-| Name                | Description                | Pattern                    | Default |
-| ------------------- | -------------------------- | -------------------------- | ------- |
-| ambiguousCharacters | Allow ambiguous characters | `` {}[]()/'"`~,;:.<>\ ``   | false   |
-| digits              | Allow digits               | `23456789`                 | true    |
-| length              | Password length            |                            | 8       |
-| lowercase           | Allow lowercase characters | `abcdefghjkmnpqrstuvwxyz`  | true    |
-| similarCharacter    | Allow similar characters   | `i, l, I, 1, \|, o, O, 0`  | false   |
-| symbols             | Allow symbols              | `!#$%&\*+-=?@^\_`          | false   |
-| uppercase           | Allow uppercase characters | `ABCDEFGHJKLMNPQRSTUVWXYZ` | true    |
+| Option      | Description                 | Value                      |
+| ----------- | --------------------------- | -------------------------- |
+| --ambiguous | Allow ambiguous characters  | `` {}[]()/'"`~,;:.<>\ ``   |
+| --count     | Generate multiple passwords | 1                          |
+| --digits    | Allow digits                | `23456789`                 |
+| --length    | Password length             | 16                         |
+| --lowercase | Allow lowercase characters  | `abcdefghjkmnpqrstuvwxyz`  |
+| --pattern   | Custom pattern              | undefined                  |
+| --similar   | Allow similar characters    | `i, l, I, 1, \|, o, O, 0`  |
+| --symbol    | Allow symbols               | `!#$%&\*+-=?@^\_`          |
+| --uppercase | Allow uppercase characters  | `ABCDEFGHJKLMNPQRSTUVWXYZ` |
 
-# We are open for new ideas
+# ☎️ Need help?
 
-you can open issue on our github page with feature request or any kind of improvements
+Create [GitHub issue](https://github.com/samarmeena/passwordx/issues)
 
-# Thank you for using passwordx
+# 💖 Thank you
+
+You can support [passwordx](https://www.npmjs.com/package/passwordx) by giving it a [GitHub](https://github.com/discordx-ts/passwordx) star.
